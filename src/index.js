@@ -16,15 +16,15 @@ app.use(passport.initialize());
 
 //import routes
 const authRoutes = require("./routes/auth");
-const mathRoutes = require("./routes/math_course");
-const chemRoutes = require("./routes/chem_course");
-const phyRoutes = require("./routes/phy_course");
+const quizRoutes = require("./routes/quiz");
+// const chemRoutes = require("./routes/chem_course");
+// const phyRoutes = require("./routes/phy_course");
 
 //initialize routes
-app.use("/api", authRoutes);
-app.use("/api/v1/maths", mathRoutes);
-app.use("/api/v1/chemistry", chemRoutes);
-app.use("/api/v1/physics", phyRoutes);
+app.use("/api/v1/user", authRoutes);
+app.use("/api/v1/quiz", quizRoutes);
+// app.use("/api/v1/chemistry", chemRoutes);
+// app.use("/api/v1/physics", phyRoutes);
 
 //app start
 const appStart = () => {

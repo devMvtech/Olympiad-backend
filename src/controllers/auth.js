@@ -5,7 +5,9 @@ const { SECRET } = require("../constants");
 
 exports.getUsers = async (req, res) => {
   try {
-    const { rows } = await db.query("select user_id, email from users");
+    const { rows } = await db.query(
+      "select user_id, username, email, date_of_birth, standard, school, aoi, parents, number, address from users"
+    );
 
     return res.status(200).json({
       success: true,
@@ -17,14 +19,36 @@ exports.getUsers = async (req, res) => {
 };
 
 exports.register = async (req, res) => {
-  const { email, password } = req.body;
+  const {
+    username,
+    email,
+    password,
+    date_of_birth,
+    standard,
+    school,
+    aoi,
+    parents,
+    number,
+    address,
+  } = req.body;
   try {
     const hashedPassword = await hash(password, 10);
 
-    await db.query("insert into users(email,password) values ($1 , $2)", [
-      email,
-      hashedPassword,
-    ]);
+    await db.query(
+      "INSERT INTO users (username, email, password, date_of_birth, standard, school, aoi, parents, number, address) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+      [
+        username,
+        email,
+        hashedPassword,
+        date_of_birth,
+        standard,
+        school,
+        aoi,
+        parents,
+        number,
+        address,
+      ]
+    );
 
     return res.status(201).json({
       success: true,

@@ -50,10 +50,8 @@ exports.register = async (req, res) => {
       ]
     );
 
-    return res.status(201).json({
-      success: true,
-      message: "The registraion was succefull",
-    });
+    req.user = { email: email }; // Assuming the user object requires email for login
+    return exports.login(req, res);
   } catch (error) {
     console.log(error.message);
     return res.status(500).json({
@@ -76,6 +74,7 @@ exports.login = async (req, res) => {
     return res.status(200).cookie("token", token, { httpOnly: true }).json({
       success: true,
       message: "Logged in succefully",
+      token: token,
     });
   } catch (error) {
     console.log(error.message);

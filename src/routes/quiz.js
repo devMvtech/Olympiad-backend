@@ -126,7 +126,7 @@ router.post("/create", uploadMiddleware_course, async (req, res) => {
   }
 });
 
-router.put("/update", uploadMiddleware_course, async (req, res) => {
+router.put("/update/:id", uploadMiddleware_course, async (req, res) => {
   try {
     // Ensure req.files is defined
     if (!req.files) {

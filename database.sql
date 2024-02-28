@@ -2,6 +2,7 @@
 CREATE TABLE quizzes (
     quiz_id SERIAL PRIMARY KEY,
     quiz_name VARCHAR(100) NOT NULL,
+    cover_img VARCHAR,
     description TEXT,
     level INT NOT NULL, -- Level of the quiz
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

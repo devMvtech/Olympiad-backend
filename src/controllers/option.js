@@ -1,31 +1,19 @@
 const db = require("../../database");
 
-// Create a quiz
-exports.createQuiz = async (req, res, formattedFileUrls) => {
-  const { quiz_name, description, level } = req.body;
+// Create an option
+exports.createOption = async (req, res) => {
+  const { question_id, option_text, is_correct } = req.body;
 
   try {
-    // Check if the quiz_name already exists
-    const cover_img = formattedFileUrls.cover_img[0].downloadURL;
-    const quizExists = await db.query(
-      "SELECT * FROM quizzes WHERE quiz_name = $1",
-      [quiz_name]
-    );
-
-    if (quizExists.rows.length > 0) {
-      return res.status(400).json({
-        error: "Quiz with the provided name already exists.",
-      });
-    }
-
+    // Insert the option into the database
     await db.query(
-      `INSERT INTO quizzes (quiz_name, description, level, cover_img) VALUES ($1, $2, $3, $4)`,
-      [quiz_name, description, level, cover_img]
+      `INSERT INTO options (question_id, option_text, is_correct) VALUES ($1, $2, $3)`,
+      [question_id, option_text, is_correct]
     );
 
     return res.status(201).json({
       success: true,
-      message: "Quiz created successfully",
+      message: "Option created successfully",
     });
   } catch (error) {
     console.error(error.message);
@@ -35,14 +23,22 @@ exports.createQuiz = async (req, res, formattedFileUrls) => {
   }
 };
 
-// Get all quizzes
-exports.getAllQuizzes = async (req, res) => {
+// Read options for a question
+exports.getOptionsForQuestion = async (req, res) => {
+  const question_id = req.params.id;
+  // console.log(question_id);
+
   try {
-    const { rows } = await db.query("SELECT * FROM quizzes");
+    // Retrieve options for the specified question
+    const {
+      rows,
+    } = await db.query("SELECT * FROM options WHERE question_id = $1", [
+      question_id,
+    ]);
 
     return res.status(200).json({
       success: true,
-      quizzes: rows,
+      options: rows,
     });
   } catch (error) {
     console.error(error.message);
@@ -52,49 +48,21 @@ exports.getAllQuizzes = async (req, res) => {
   }
 };
 
-// Get By Id
-exports.getQuizById = async (req, res) => {
-  const { id } = req.params;
+// Update an option
+exports.updateOption = async (req, res) => {
+  const option_id = req.params.id;
+  const { option_text, is_correct } = req.body;
 
   try {
-    const query = "SELECT * FROM quizzes WHERE quiz_id = $1";
-    const values = [id];
-    const result = await db.query(query, values);
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({
-        error: "Quiz not found.",
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      quiz: result.rows[0],
-    });
-  } catch (error) {
-    console.error(error.message);
-    return res.status(500).json({
-      error: "Internal server error",
-    });
-  }
-};
-
-// Update a quiz
-exports.updateQuiz = async (req, res, formattedFileUrls) => {
-  const id = req.params.id;
-  const { quiz_name, description, level } = req.body;
-
-  try {
-    const cover_img = formattedFileUrls.cover_img[0].downloadURL;
-
+    // Update the option in the database
     await db.query(
-      `UPDATE quizzes SET quiz_name=$1, description=$2, level=$3, cover_img=$4 WHERE quiz_id=$4`,
-      [quiz_name, description, level, cover_img, id]
+      `UPDATE options SET option_text=$1, is_correct=$2 WHERE option_id=$3`,
+      [option_text, is_correct, option_id]
     );
 
     return res.status(200).json({
       success: true,
-      message: "Quiz updated successfully",
+      message: "Option updated successfully",
     });
   } catch (error) {
     console.error(error.message);
@@ -104,16 +72,17 @@ exports.updateQuiz = async (req, res, formattedFileUrls) => {
   }
 };
 
-// Delete a quiz
-exports.deleteQuiz = async (req, res) => {
-  const id = req.params.id;
+// Delete an option
+exports.deleteOption = async (req, res) => {
+  const option_id = req.params.id;
 
   try {
-    await db.query("DELETE FROM quizzes WHERE quiz_id=$1", [id]);
+    // Delete the option from the database
+    await db.query("DELETE FROM options WHERE option_id=$1", [option_id]);
 
     return res.status(200).json({
       success: true,
-      message: "Quiz deleted successfully",
+      message: "Option deleted successfully",
     });
   } catch (error) {
     console.error(error.message);

@@ -1,31 +1,19 @@
 const db = require("../../database");
 
-// Create a quiz
-exports.createQuiz = async (req, res, formattedFileUrls) => {
-  const { quiz_name, description, level } = req.body;
+// Create a question
+exports.createQuestion = async (req, res) => {
+  const { quiz_id, question_text } = req.body;
 
   try {
-    // Check if the quiz_name already exists
-    const cover_img = formattedFileUrls.cover_img[0].downloadURL;
-    const quizExists = await db.query(
-      "SELECT * FROM quizzes WHERE quiz_name = $1",
-      [quiz_name]
-    );
-
-    if (quizExists.rows.length > 0) {
-      return res.status(400).json({
-        error: "Quiz with the provided name already exists.",
-      });
-    }
-
+    // Insert the question into the database
     await db.query(
-      `INSERT INTO quizzes (quiz_name, description, level, cover_img) VALUES ($1, $2, $3, $4)`,
-      [quiz_name, description, level, cover_img]
+      `INSERT INTO questions (quiz_id, question_text) VALUES ($1, $2)`,
+      [quiz_id, question_text]
     );
 
     return res.status(201).json({
       success: true,
-      message: "Quiz created successfully",
+      message: "Question created successfully",
     });
   } catch (error) {
     console.error(error.message);
@@ -35,14 +23,15 @@ exports.createQuiz = async (req, res, formattedFileUrls) => {
   }
 };
 
-// Get all quizzes
-exports.getAllQuizzes = async (req, res) => {
+// Get all questions
+exports.getAllQuestions = async (req, res) => {
   try {
-    const { rows } = await db.query("SELECT * FROM quizzes");
+    // Retrieve all questions from the database
+    const { rows } = await db.query("SELECT * FROM questions");
 
     return res.status(200).json({
       success: true,
-      quizzes: rows,
+      questions: rows,
     });
   } catch (error) {
     console.error(error.message);
@@ -52,24 +41,24 @@ exports.getAllQuizzes = async (req, res) => {
   }
 };
 
-// Get By Id
-exports.getQuizById = async (req, res) => {
+// Get question by ID
+exports.getQuestionById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const query = "SELECT * FROM quizzes WHERE quiz_id = $1";
-    const values = [id];
-    const result = await db.query(query, values);
+    // Query the database to get the question by ID
+    const query = "SELECT * FROM questions WHERE quiz_id = $1";
+    const { rows } = await db.query(query, [id]);
 
-    if (result.rows.length === 0) {
+    if (rows.length === 0) {
       return res.status(404).json({
-        error: "Quiz not found.",
+        error: "Question not found.",
       });
     }
 
     return res.status(200).json({
       success: true,
-      quiz: result.rows[0],
+      question: rows,
     });
   } catch (error) {
     console.error(error.message);
@@ -79,22 +68,21 @@ exports.getQuizById = async (req, res) => {
   }
 };
 
-// Update a quiz
-exports.updateQuiz = async (req, res, formattedFileUrls) => {
-  const id = req.params.id;
-  const { quiz_name, description, level } = req.body;
+// Update a question
+exports.updateQuestion = async (req, res) => {
+  const question_id = req.params;
+  const { question_text } = req.body;
 
   try {
-    const cover_img = formattedFileUrls.cover_img[0].downloadURL;
-
+    // Update the question in the database
     await db.query(
-      `UPDATE quizzes SET quiz_name=$1, description=$2, level=$3, cover_img=$4 WHERE quiz_id=$4`,
-      [quiz_name, description, level, cover_img, id]
+      `UPDATE questions SET question_text=$1 WHERE question_id=$2`,
+      [question_text, question_id]
     );
 
     return res.status(200).json({
       success: true,
-      message: "Quiz updated successfully",
+      message: "Question updated successfully",
     });
   } catch (error) {
     console.error(error.message);
@@ -104,16 +92,17 @@ exports.updateQuiz = async (req, res, formattedFileUrls) => {
   }
 };
 
-// Delete a quiz
-exports.deleteQuiz = async (req, res) => {
-  const id = req.params.id;
+// Delete a question
+exports.deleteQuestion = async (req, res) => {
+  const question_id = req.params.id;
 
   try {
-    await db.query("DELETE FROM quizzes WHERE quiz_id=$1", [id]);
+    // Delete the question from the database
+    await db.query("DELETE FROM questions WHERE question_id=$1", [question_id]);
 
     return res.status(200).json({
       success: true,
-      message: "Quiz deleted successfully",
+      message: "Question deleted successfully",
     });
   } catch (error) {
     console.error(error.message);

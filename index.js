@@ -17,14 +17,14 @@ app.use(passport.initialize());
 //import routes
 const authRoutes = require("./src/routes/auth");
 const quizRoutes = require("./src/routes/quiz");
-// const chemRoutes = require("./src/routes/chem_course");
-// const phyRoutes = require("./src/routes/phy_course");
+const questionRoutes = require("./src/routes/question");
+const optionRoutes = require("./src/routes/option");
 
 //initialize routes
 app.use("/api/v1/user", authRoutes);
 app.use("/api/v1/quiz", quizRoutes);
-// app.use("/api/v1/chemistry", chemRoutes);
-// app.use("/api/v1/physics", phyRoutes);
+app.use("/api/v1/question", questionRoutes);
+app.use("/api/v1/option", optionRoutes);
 
 //app start
 const appStart = () => {

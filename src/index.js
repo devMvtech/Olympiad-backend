@@ -19,12 +19,14 @@ const authRoutes = require("./routes/auth");
 const quizRoutes = require("./routes/quiz");
 const questionRoutes = require("./routes/question");
 const optionRoutes = require("./routes/option");
+const responseRoutes = require("./routes/user_resp");
 
 //initialize routes
 app.use("/api/v1/user", authRoutes);
 app.use("/api/v1/quiz", quizRoutes);
 app.use("/api/v1/question", questionRoutes);
 app.use("/api/v1/option", optionRoutes);
+app.use("/api/v1/answer", responseRoutes);
 
 //app start
 const appStart = () => {

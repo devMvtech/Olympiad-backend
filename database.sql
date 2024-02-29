@@ -13,6 +13,8 @@ CREATE TABLE questions (
     question_id SERIAL PRIMARY KEY,
     quiz_id INT NOT NULL,
     question_text TEXT NOT NULL,
+    marks INT NOT NULL,
+    total_correct_opt INT ,
     FOREIGN KEY (quiz_id) REFERENCES quizzes(quiz_id) ON DELETE CASCADE
 );
 

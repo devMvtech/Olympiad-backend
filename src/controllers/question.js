@@ -2,13 +2,13 @@ const db = require("../../database");
 
 // Create a question
 exports.createQuestion = async (req, res) => {
-  const { quiz_id, question_text } = req.body;
+  const { quiz_id, question_text, marks, total_correct_opt } = req.body;
 
   try {
     // Insert the question into the database
     await db.query(
-      `INSERT INTO questions (quiz_id, question_text) VALUES ($1, $2)`,
-      [quiz_id, question_text]
+      `INSERT INTO questions (quiz_id, question_text, marks, total_correct_opt) VALUES ($1, $2, $3, $4)`,
+      [quiz_id, question_text, marks, total_correct_opt]
     );
 
     return res.status(201).json({

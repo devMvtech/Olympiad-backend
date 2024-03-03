@@ -32,6 +32,21 @@ exports.createUserResponse = async (req, res) => {
       );
     }
 
+    // Fetch the count of correct responses for the given quiz and user
+    const {
+      rows: [{ count: correctResponsesCount }],
+    } = await db.query(
+      `SELECT COUNT(*) FROM user_responses WHERE user_id = $1 AND quiz_id = $2 AND is_correct = true`,
+      [user_id, quiz_id]
+    );
+
+    // Insert or update the student progress into the database with the number of correct responses as the score
+    await db.query(
+      `INSERT INTO student_progress (user_id, quiz_id, score) VALUES ($1, $2, $3)
+       ON CONFLICT (user_id, quiz_id) DO UPDATE SET score = EXCLUDED.score`,
+      [user_id, quiz_id, correctResponsesCount]
+    );
+
     return res.status(201).json({
       success: true,
       message: "User responses recorded successfully",
@@ -54,6 +69,31 @@ exports.getUserResponsesForQuiz = async (req, res) => {
       rows,
     } = await db.query(
       "SELECT * FROM user_responses WHERE user_id = $1 AND quiz_id = $2",
+      [user_id, quiz_id]
+    );
+
+    return res.status(200).json({
+      success: true,
+      user_responses: rows,
+    });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+};
+
+// Get all user responses for a user and quiz
+exports.getUserScore = async (req, res) => {
+  const { user_id, quiz_id } = req.params;
+
+  try {
+    // Retrieve user responses for the specified user and quiz
+    const {
+      rows,
+    } = await db.query(
+      "SELECT * FROM student_progress WHERE user_id = $1 AND quiz_id = $2",
       [user_id, quiz_id]
     );
 
